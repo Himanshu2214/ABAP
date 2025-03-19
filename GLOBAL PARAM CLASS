@@ -1,0 +1,122 @@
+Class: ZCL_GL00001_GLOBAL_PARAM_READ
+Description:
+This class is used to read global parameter values from the ZGL00001T_PARAM table. It offers methods to retrieve a single parameter value or a range of parameter values.
+
+Methods:
+
+Constructor: Initializes the class and loads parameter data into an internal table based on OBJ_ID and optional PARAM_NAME range.
+read_single: Fetches the value of a specific parameter (PARAM_VALUE) based on the PARAM_NAME.
+read_range: Retrieves a range of parameter values, splitting them by a specified delimiter.
+Table: ZGL00001T_PARAM
+
+Stores global parameter details like OBJ_ID, PARAM_NAME, PARAM_VALUE, and PARAM_DESC.
+Usage:
+
+Use read_single to get a single parameter's value.
+Use read_range to retrieve and split a parameter's value into a range of values.
+
+
+/********************************************************************
+ *  Class: ZCL_GL00001_GLOBAL_PARAM_READ                           *
+ *  Description: Reads global parameter values from table          *
+ *                                                                  *
+ *  Example Usage:                                                 *
+ *  1. Read a single parameter value                               *
+ *  2. Read a range of parameter values                            *
+ *******************************************************************/
+ 
+********************************************************************
+ * Table: ZGL00001T_PARAM                                         *
+ * Description: Global parameter table                            *
+ ********************************************************************
+ * Field Name     | Position | Key | Data Element            | Domain   | Data Type | Length | Lowercase | Description                      *
+ *--------------------------------------------------------------------------------------------------------------*
+ * MANDT         | 1        | X   | MANDT                   | MANDT    | CLNT      | 3      |           | Client                           *
+ * OBJ_ID        | 2        | X   | ZGL00001DE_OBJ_ID       | PROGNAME | CHAR      | 40     |           | Object ID - Global Parameter    *
+ * PARAM_NAME    | 3        | X   | ZGL00001DE_PARAM_NAME   | CHAR30   | CHAR      | 30     |           | Parameter name                   *
+ * PARAM_VALUE   | 4        |     | ZGL00001DE_PARAM_VALUE  | CHAR132K | CHAR      | 132    | X         | Parameter value                   *
+ * PARAM_DESC    | 5        |     | ZGL00001DE_PARAM_DESC   | CHAR132K | CHAR      | 132    | X         | Parameter description             *
+ ********************************************************************/
+ 
+CLASS zcl_gl00001_global_param_read DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC.
+
+  PUBLIC SECTION.
+
+    TYPES: t_name_range TYPE RANGE OF zgl00001de_param_name.
+
+    METHODS:
+      constructor
+        IMPORTING
+          iv_obj_id     TYPE zgl00001de_obj_id
+          ir_param_name TYPE t_name_range OPTIONAL,
+
+      read_single
+        IMPORTING
+          iv_param_name  TYPE zgl00001de_param_name
+        RETURNING
+          VALUE(ev_param_value) TYPE zgl00001de_param_value,
+
+      read_range
+        IMPORTING
+          iv_param_name      TYPE zgl00001de_param_name
+          iv_data_element    TYPE rollname
+          iv_value_separator TYPE char1 DEFAULT ','
+        EXPORTING
+          er_param_values    TYPE STANDARD TABLE.
+
+  PRIVATE SECTION.
+    DATA gt_all_param TYPE SORTED TABLE OF zgl00001t_param WITH UNIQUE KEY param_name.
+
+ENDCLASS.
+
+
+CLASS zcl_gl00001_global_param_read IMPLEMENTATION.
+
+  " Constructor Method
+  METHOD constructor.
+    " Select only required fields for better performance
+    SELECT obj_id, param_name, param_value FROM zgl00001t_param
+      WHERE obj_id     = @iv_obj_id
+        AND param_name IN @ir_param_name
+      ORDER BY PRIMARY KEY
+      INTO TABLE @gt_all_param.
+  ENDMETHOD.
+
+
+  " Method: Read Single Parameter
+  METHOD read_single.
+    CLEAR ev_param_value.
+    READ TABLE gt_all_param INTO DATA(ls_param)
+      WITH KEY param_name = iv_param_name
+      BINARY SEARCH.
+    IF sy-subrc = 0.
+      ev_param_value = ls_param-param_value.
+    ENDIF.
+  ENDMETHOD.
+
+
+  " Method: Read Range of Parameter Values
+  METHOD read_range.
+    TYPES: lty_range TYPE RANGE OF zgl00001de_param_value.
+    DATA: lr_value_range TYPE lty_range,
+          ls_value_range LIKE LINE OF lr_value_range,
+          lt_value_tab   TYPE TABLE OF zgl00001de_param_value,
+          ls_value_line  TYPE zgl00001de_param_value.
+
+    READ TABLE gt_all_param INTO DATA(ls_param) WITH KEY param_name = iv_param_name.
+    IF sy-subrc = 0 AND ls_param-param_value IS NOT INITIAL.
+      SPLIT ls_param-param_value AT iv_value_separator INTO TABLE lt_value_tab.
+      LOOP AT lt_value_tab INTO ls_value_line.
+        ls_value_range-sign   = 'I'.
+        ls_value_range-option = 'EQ'.
+        ls_value_range-low    = ls_value_line.
+        APPEND ls_value_range TO lr_value_range.
+      ENDLOOP.
+      er_param_values = lr_value_range.
+    ENDIF.
+  ENDMETHOD.
+
+ENDCLASS.
