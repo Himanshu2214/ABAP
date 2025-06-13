@@ -1,0 +1,4 @@
+@EndUserText.label: 'Sales Order OData V2 Service'
+define service Z_UI_SALESORDER_O2 {
+  expose Z_I_SalesOrderHeader_TP as SalesOrder;
+}

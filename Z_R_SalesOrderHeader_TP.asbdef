@@ -1,0 +1,14 @@
+managed implementation in class ZBP_R_SALESORDERHEADER_TP unique;
+strict ( 2 );
+with draft;
+
+define behavior for Z_I_SalesOrderHeader_TP alias SalesOrderHeader
+persistent table vbak
+lock master
+authorization master ( global )
+etag master LastChangeDate
+{
+  update;
+  read;
+  association _Item { create; }
+}

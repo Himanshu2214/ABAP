@@ -1,0 +1,15 @@
+managed implementation in class ZBP_R_SALESORDERITEM_TP unique;
+strict ( 2 );
+with draft;
+
+define behavior for Z_I_SalesOrderItem_TP alias SalesOrderItem
+persistent table vbap
+lock dependent by _Header
+authorization dependent by _Header
+etag dependent by _Header
+{
+  field ( readonly ) SalesOrder, SalesOrderItem;
+  update;
+  read;
+  association _Header;
+}
