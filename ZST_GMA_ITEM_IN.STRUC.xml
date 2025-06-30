@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_STRUC" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VERSION>5</VERSION>
+   < ενεργ>A</ ενεργ>
+   <CMPVERSION>0</CMPVERSION>
+   <REFTYPE>D</REFTYPE>
+   < αυτές>Structure for Goods Movement API Item Input</ αυτές>
+   < элементы>
+    <SCOLIS>
+     <CMPNAME>MATERIAL</CMPNAME>
+     <ROLLNAME>MATNR</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Material Number</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>ITEM_NO</CMPNAME>
+     <ROLLNAME>CHAR6</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Item Number (maps to BAPI LINE_ID)</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>MAT_DESC</CMPNAME>
+     <ROLLNAME>MAKTX</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Material Description</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>BASE_UOM</CMPNAME>
+     <ROLLNAME>MEINS</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Base Unit of Measure</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>QUANTITY</CMPNAME>
+     <ROLLNAME>MENGE_D</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Quantity</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>STRG_LOC</CMPNAME>
+     <ROLLNAME>LGORT_D</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Storage Location</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>PLANT</CMPNAME>
+     <ROLLNAME>WERKS_D</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Plant</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>GL_ACCOUNT</CMPNAME>
+     <ROLLNAME>SAKNR</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>G/L Account Number</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>COSTCENTER</CMPNAME>
+     <ROLLNAME>KOSTL</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Cost Center</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>ORDER_NO</CMPNAME>
+     <ROLLNAME>AUFNR</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Order Number</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>ITEM_OK</CMPNAME>
+     <ROLLNAME>FLAG</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Item is OK</ αυτές>
+    </SCOLIS>
+   </ элементы>
+  </asx:values>
+ </asx:abap>
+</abapGit>

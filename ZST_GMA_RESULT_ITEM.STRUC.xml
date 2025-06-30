@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_STRUC" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VERSION>5</VERSION>
+   < ενεργ>A</ ενεργ>
+   <CMPVERSION>0</CMPVERSION>
+   <REFTYPE>D</REFTYPE>
+   < αυτές>Structure for Goods Movement API Result Item</ αυτές>
+   < элементы>
+    <SCOLIS>
+     <CMPNAME>GR_GI_SLIP_NO</CMPNAME>
+     <ROLLNAME>XABLN</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>GR/GI Slip No. (from input for correlation)</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>MIGO_NUMBER</CMPNAME>
+     <ROLLNAME>MBLNR</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Material Document Number (MIGO)</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>SUCCESS</CMPNAME>
+     <ROLLNAME>FLAG</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Flag indicating success of this item's posting</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>MESSAGE</CMPNAME>
+     <ROLLNAME>BAPI_MSG</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Message (error or success)</ αυτές>
+    </SCOLIS>
+   </ элементы>
+  </asx:values>
+ </asx:abap>
+</abapGit>

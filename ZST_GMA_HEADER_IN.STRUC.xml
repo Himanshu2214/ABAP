@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_STRUC" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VERSION>5</VERSION>
+   < ενεργ>A</ ενεργ>
+   <CMPVERSION>0</CMPVERSION>
+   <REFTYPE>D</REFTYPE>
+   < αυτές>Structure for Goods Movement API Header Input</ αυτές>
+   < элементы>
+    <SCOLIS>
+     <CMPNAME>ZTYPE_GM</CMPNAME>
+     <ROLLNAME>CHAR10</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>GM Type</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>ZSUB_TYPE</CMPNAME>
+     <ROLLNAME>CHAR4</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>GM Sub Type</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>MOVEMENTTYPE</CMPNAME>
+     <ROLLNAME>BWART</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Movement Type</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>DOC_DATE</CMPNAME>
+     <ROLLNAME>BLDAT</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Document Date</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>PSTNG_DATE</CMPNAME>
+     <ROLLNAME>BUDAT</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Posting Date</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>GR_GI_SLIP_NO</CMPNAME>
+     <ROLLNAME>XABLN</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>GR/GI Slip No.</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>HEADER_TXT</CMPNAME>
+     <ROLLNAME>BKTXT</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Document Header Text</ αυτές>
+    </SCOLIS>
+    <SCOLIS>
+     <CMPNAME>HEADERTOITEMNAV</CMPNAME>
+     <ROLLNAME>ZTT_GMA_ITEMS_IN</ROLLNAME>
+     <LANGU>E</LANGU>
+     < αυτές>Items for this Header</ αυτές>
+    </SCOLIS>
+   </ элементы>
+  </asx:values>
+ </asx:abap>
+</abapGit>
