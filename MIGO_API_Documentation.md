@@ -7,6 +7,7 @@ This API allows you to post MIGO (Material Document) entries using SAP's BAPI_GO
 
 ### 1. Core Classes
 - **ZCL_MIGO_POSTING_IMPROVED**: Main business logic class that handles MIGO posting
+- **ZCL_MIGO_BATCH_PROCESSOR**: Enhanced batch processor for high-volume processing (50+ records)
 - **ZCL_REST_MIGO_POSTING**: REST endpoint handler class
 - **ZBP_I_MIGO_POSTING**: RAP behavior implementation class
 
@@ -100,6 +101,32 @@ This API allows you to post MIGO (Material Document) entries using SAP's BAPI_GO
 ]
 ```
 
+### Batch Processing Response (For High Volume)
+```json
+{
+  "batchSummary": {
+    "totalRecords": 50,
+    "successfulCount": 48,
+    "failedCount": 2,
+    "totalItems": 150,
+    "processingTime": "25.450 seconds",
+    "startTime": "2024-01-15T10:30:00.000Z",
+    "endTime": "2024-01-15T10:30:25.450Z"
+  },
+  "responses": [
+    {
+      "success": true,
+      "materialDocument": "5000000123",
+      "message": "Material Document 5000000123 created successfully for GI407",
+      "grgiSlipno": "GI407",
+      "processingTime": "0.250 sec",
+      "itemCount": 3,
+      "errors": []
+    }
+  ]
+}
+```
+
 ## Movement Type Configuration
 
 The API supports various movement types with appropriate goods movement codes:
@@ -117,7 +144,7 @@ Example: `/Date(1750099200000)/` represents a date in the future.
 
 ## Usage Examples
 
-### 1. Direct Class Usage
+### 1. Direct Class Usage (Standard Processing)
 ```abap
 DATA: lo_migo_api TYPE REF TO zcl_migo_posting_improved,
       lv_payload  TYPE string,
@@ -125,6 +152,20 @@ DATA: lo_migo_api TYPE REF TO zcl_migo_posting_improved,
 
 CREATE OBJECT lo_migo_api.
 lv_response = lo_migo_api->post_migo( lv_payload ).
+```
+
+### 1b. High-Volume Batch Processing (50+ Records)
+```abap
+DATA: lo_batch_processor TYPE REF TO zcl_migo_batch_processor,
+      lv_payload         TYPE string,
+      lv_response        TYPE string,
+      lv_batch_size      TYPE i VALUE 10.
+
+CREATE OBJECT lo_batch_processor.
+lv_response = lo_batch_processor->post_migo_batch( 
+  iv_payload = lv_payload 
+  iv_batch_size = lv_batch_size 
+).
 ```
 
 ### 2. REST Endpoint Usage
@@ -164,6 +205,39 @@ Content-Type: application/json
 }
 ```
 
+## Batch Processing for High Volume (50+ Records)
+
+### Performance Optimizations
+- **Chunked Processing**: Processes records in configurable batches (default: 10, max: 100)
+- **Memory Management**: Commits after each chunk to prevent memory issues
+- **Payload Validation**: Pre-validates payload size (max 50MB)
+- **Individual Timing**: Tracks processing time per record and overall batch
+- **Progress Logging**: Logs chunk completion for monitoring
+
+### Batch Size Guidelines
+- **1-10 records**: Use standard processing (`ZCL_MIGO_POSTING_IMPROVED`)
+- **11-50 records**: Use batch processor with batch size 5-10
+- **51-100 records**: Use batch processor with batch size 10-15
+- **100+ records**: Split into multiple API calls or increase batch size to 20-25
+
+### Response Structure for Batches
+```json
+{
+  "batchSummary": {
+    "totalRecords": 50,        // Total number of headers
+    "successfulCount": 48,     // Successfully processed
+    "failedCount": 2,          // Failed to process
+    "totalItems": 150,         // Total line items across all headers
+    "processingTime": "25.450 seconds",
+    "startTime": "2024-01-15T10:30:00.000Z",
+    "endTime": "2024-01-15T10:30:25.450Z"
+  },
+  "responses": [
+    // Individual responses for each header
+  ]
+}
+```
+
 ## Error Handling
 
 The API implements comprehensive error handling:
@@ -172,6 +246,7 @@ The API implements comprehensive error handling:
 2. **Validation Errors**: Missing required fields, invalid data types
 3. **BAPI Errors**: Business logic errors from SAP
 4. **System Errors**: Database, connectivity issues
+5. **Batch Processing Errors**: Payload size, chunk processing failures
 
 All errors are captured and returned in the response with descriptive messages.
 
