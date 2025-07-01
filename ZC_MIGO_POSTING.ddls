@@ -1,0 +1,18 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'MIGO Posting Consumption View'
+@Metadata.allowExtensions: true
+define root view entity ZC_MIGO_POSTING as projection on ZI_MIGO_POSTING
+{
+  key Client,
+  key RequestId,
+  ZtypeGm,
+  ZsubType,
+  MovementType,
+  DocDate,
+  PstngDate,
+  GrGiSlipNo,
+  HeaderTxt,
+  MaterialDocument,
+  Success,
+  Message
+}

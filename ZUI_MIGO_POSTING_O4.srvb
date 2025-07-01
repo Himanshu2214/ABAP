@@ -1,0 +1,4 @@
+@EndUserText.label: 'MIGO Posting Service Binding'
+define service binding ZUI_MIGO_POSTING_O4 {
+  expose ZUI_MIGO_POSTING_O4 as 'MigoPostingService' version 'V4';
+}

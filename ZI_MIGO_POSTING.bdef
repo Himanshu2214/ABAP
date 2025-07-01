@@ -1,0 +1,28 @@
+managed implementation in class zbp_i_migo_posting unique;
+strict ( 2 );
+
+define behavior for ZI_MIGO_POSTING alias MigoPosting
+persistent table dummy_table
+lock master
+authorization master ( instance )
+{
+  create;
+  update;
+  delete;
+  
+  action post_migo parameter $self result [1] $self;
+  
+  mapping for dummy_table {
+    RequestId = request_id;
+    ZtypeGm = ztype_gm;
+    ZsubType = zsub_type;
+    MovementType = movement_type;
+    DocDate = doc_date;
+    PstngDate = pstng_date;
+    GrGiSlipNo = gr_gi_slip_no;
+    HeaderTxt = header_txt;
+    MaterialDocument = material_document;
+    Success = success;
+    Message = message;
+  }
+}
