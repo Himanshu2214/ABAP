@@ -12,7 +12,7 @@ CLASS zcl_migo_posting_improved DEFINITION
              entryuom  TYPE string,
            END OF ty_migo_item.
 
-    TYPES: tt_migo_item TYPE TABLE OF ty_migo_item.
+    TYPES: tt_migo_item TYPE STANDARD TABLE OF ty_migo_item WITH NON-UNIQUE DEFAULT KEY.
 
     TYPES: BEGIN OF ty_migo_header,
              ztypegm         TYPE string,
@@ -30,11 +30,11 @@ CLASS zcl_migo_posting_improved DEFINITION
              material_document TYPE string,
              message           TYPE string,
              grgiSlipno        TYPE string,
-             errors            TYPE TABLE OF string,
+             errors            TYPE STANDARD TABLE OF string WITH NON-UNIQUE DEFAULT KEY,
            END OF ty_response.
 
-    TYPES: tt_migo_header TYPE TABLE OF ty_migo_header,
-           tt_response    TYPE TABLE OF ty_response.
+    TYPES: tt_migo_header TYPE STANDARD TABLE OF ty_migo_header WITH NON-UNIQUE DEFAULT KEY,
+           tt_response    TYPE STANDARD TABLE OF ty_response WITH NON-UNIQUE DEFAULT KEY.
 
     METHODS: post_migo
       IMPORTING

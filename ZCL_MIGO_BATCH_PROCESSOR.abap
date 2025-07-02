@@ -12,7 +12,7 @@ CLASS zcl_migo_batch_processor DEFINITION
              entryuom  TYPE string,
            END OF ty_migo_item.
 
-    TYPES: tt_migo_item TYPE TABLE OF ty_migo_item.
+    TYPES: tt_migo_item TYPE STANDARD TABLE OF ty_migo_item WITH NON-UNIQUE DEFAULT KEY.
 
     TYPES: BEGIN OF ty_migo_header,
              ztypegm         TYPE string,
@@ -32,7 +32,7 @@ CLASS zcl_migo_batch_processor DEFINITION
              grgiSlipno        TYPE string,
              processing_time   TYPE string,
              item_count        TYPE i,
-             errors            TYPE TABLE OF string,
+             errors            TYPE STANDARD TABLE OF string WITH NON-UNIQUE DEFAULT KEY,
            END OF ty_response.
 
     TYPES: BEGIN OF ty_batch_summary,
@@ -47,10 +47,10 @@ CLASS zcl_migo_batch_processor DEFINITION
 
     TYPES: BEGIN OF ty_batch_response,
              batch_summary TYPE ty_batch_summary,
-             responses     TYPE TABLE OF ty_response,
+             responses     TYPE STANDARD TABLE OF ty_response WITH NON-UNIQUE DEFAULT KEY,
            END OF ty_batch_response.
 
-    TYPES: tt_migo_header TYPE TABLE OF ty_migo_header.
+    TYPES: tt_migo_header TYPE STANDARD TABLE OF ty_migo_header WITH NON-UNIQUE DEFAULT KEY.
 
     CONSTANTS: c_max_batch_size TYPE i VALUE 100.
 

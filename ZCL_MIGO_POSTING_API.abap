@@ -4,7 +4,7 @@ CLASS zcl_migo_posting_api DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    TYPES: tt_ref_data TYPE TABLE OF REF TO data.
+    TYPES: tt_ref_data TYPE STANDARD TABLE OF REF TO data WITH NON-UNIQUE DEFAULT KEY.
     
     TYPES: BEGIN OF ty_migo_header,
              ztypegm         TYPE string,
@@ -29,12 +29,12 @@ CLASS zcl_migo_posting_api DEFINITION
              success         TYPE abap_bool,
              material_document TYPE mblnr,
              message         TYPE string,
-             errors          TYPE TABLE OF string,
+             errors          TYPE STANDARD TABLE OF string WITH NON-UNIQUE DEFAULT KEY,
            END OF ty_response.
 
-    TYPES: tt_migo_header TYPE TABLE OF ty_migo_header,
-           tt_migo_item   TYPE TABLE OF ty_migo_item,
-           tt_response    TYPE TABLE OF ty_response.
+    TYPES: tt_migo_header TYPE STANDARD TABLE OF ty_migo_header WITH NON-UNIQUE DEFAULT KEY,
+           tt_migo_item   TYPE STANDARD TABLE OF ty_migo_item WITH NON-UNIQUE DEFAULT KEY,
+           tt_response    TYPE STANDARD TABLE OF ty_response WITH NON-UNIQUE DEFAULT KEY.
 
     METHODS: post_migo
       IMPORTING
