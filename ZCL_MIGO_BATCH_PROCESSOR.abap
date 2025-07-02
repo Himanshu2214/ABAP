@@ -231,8 +231,7 @@ CLASS zcl_migo_batch_processor IMPLEMENTATION.
         ).
 
       CATCH cx_sy_conversion_no_number
-            cx_sy_move_cast_error
-            /ui2/cx_json INTO DATA(lx_error).
+            cx_sy_move_cast_error INTO DATA(lx_error).
         
         " Handle JSON processing errors
         ls_batch_response-batch_summary-failed_count = 1.

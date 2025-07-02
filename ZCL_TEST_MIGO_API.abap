@@ -99,7 +99,7 @@ CLASS zcl_test_migo_api IMPLEMENTATION.
           WRITE: / 'Number of Items:', lines( ls_header-headertoitemnav ).
         ENDIF.
 
-      CATCH /ui2/cx_json INTO DATA(lx_json).
+      CATCH cx_root INTO DATA(lx_json).
         WRITE: / 'JSON Parsing Error:', lx_json->get_text( ).
     ENDTRY.
 

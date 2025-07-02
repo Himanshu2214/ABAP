@@ -93,11 +93,21 @@ CLASS zcl_migo_posting_improved IMPLEMENTATION.
         ).
 
       CATCH cx_sy_conversion_no_number
-            cx_sy_move_cast_error
-            /ui2/cx_json INTO DATA(lx_error).
+            cx_sy_move_cast_error INTO DATA(lx_error).
         
         ls_response-success = abap_false.
         ls_response-message = |JSON processing error: { lx_error->get_text( ) }|.
+        APPEND ls_response TO lt_responses.
+        
+        rv_response = /ui2/cl_json=>serialize(
+          data = lt_responses
+          pretty_name = /ui2/cl_json=>pretty_mode-camel_case
+        ).
+
+      CATCH cx_root INTO DATA(lx_general_error).
+        " Handle any other JSON or general errors
+        ls_response-success = abap_false.
+        ls_response-message = |General processing error: { lx_general_error->get_text( ) }|.
         APPEND ls_response TO lt_responses.
         
         rv_response = /ui2/cl_json=>serialize(
