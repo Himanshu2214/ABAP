@@ -1,0 +1,45 @@
+CLASS zbp_i_migo_posting DEFINITION
+  PUBLIC
+  INHERITING FROM cl_abap_behavior_handler
+  FINAL.
+
+  PRIVATE SECTION.
+    CONSTANTS: c_scenario TYPE string VALUE 'ZI_MIGO_POSTING' ##NO_TEXT.
+    
+    METHODS: post_migo FOR MODIFY
+      IMPORTING entities FOR ACTION zi_migo_posting~post_migo
+      RESULT result.
+
+ENDCLASS.
+
+CLASS zbp_i_migo_posting IMPLEMENTATION.
+
+  METHOD post_migo.
+    DATA: lo_migo_api TYPE REF TO zcl_migo_posting_api,
+          lv_payload  TYPE string,
+          lv_response TYPE string.
+
+    " Read the entities
+    READ ENTITIES OF zi_migo_posting IN LOCAL MODE
+      ENTITY zi_migo_posting
+      ALL FIELDS WITH CORRESPONDING #( entities )
+      RESULT DATA(lt_entities).
+
+    LOOP AT entities INTO DATA(ls_entity).
+      " Get the payload from the action parameters
+      DATA(ls_keys) = entities[ 1 ]-%param.
+      
+      " Create instance of MIGO API
+      CREATE OBJECT lo_migo_api.
+      
+      " Call the post_migo method with the payload
+      lv_response = lo_migo_api->post_migo( ls_keys ).
+      
+      " Append result
+      APPEND VALUE #( %tky = ls_entity-%tky 
+                      %param = VALUE #( response = lv_response ) ) TO result.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+ENDCLASS.

@@ -1,0 +1,4 @@
+@EndUserText.label: 'MIGO Posting Service Definition'
+define service ZUI_MIGO_POSTING_O4 {
+  expose ZC_MIGO_POSTING as MigoPosting;
+}
