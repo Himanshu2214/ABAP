@@ -12,6 +12,8 @@ CLASS zcl_migo_batch_processor DEFINITION
              entryuom  TYPE string,
            END OF ty_migo_item.
 
+    TYPES: tt_migo_item TYPE TABLE OF ty_migo_item.
+
     TYPES: BEGIN OF ty_migo_header,
              ztypegm         TYPE string,
              zsubtype        TYPE string,
@@ -20,7 +22,7 @@ CLASS zcl_migo_batch_processor DEFINITION
              pstngdate       TYPE string,
              grgiSlipno      TYPE string,
              headertxt       TYPE string,
-             headertoitemnav TYPE TABLE OF ty_migo_item,
+             headertoitemnav TYPE tt_migo_item,
            END OF ty_migo_header.
 
     TYPES: BEGIN OF ty_response,

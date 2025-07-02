@@ -4,6 +4,8 @@ CLASS zcl_migo_posting_api DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+    TYPES: tt_ref_data TYPE TABLE OF REF TO data.
+    
     TYPES: BEGIN OF ty_migo_header,
              ztypegm         TYPE string,
              zsubtype        TYPE string,
@@ -12,7 +14,7 @@ CLASS zcl_migo_posting_api DEFINITION
              pstngdate       TYPE string,
              grgiSlipno      TYPE string,
              headertxt       TYPE string,
-             headertoitemnav TYPE TABLE OF REF TO data,
+             headertoitemnav TYPE tt_ref_data,
            END OF ty_migo_header.
 
     TYPES: BEGIN OF ty_migo_item,
