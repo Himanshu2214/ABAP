@@ -198,10 +198,9 @@ METHOD goodsmvtflatset_create_entity.
       
       " Add success message to context if successful
       IF ls_result-status = 'SUCCESS'.
-        /iwbep/cl_mgw_data_util=>message_container_add_message(
-          io_message_container = mo_context->get_message_container( )
-          iv_message_text = ls_result-message
-          iv_message_type = 'S' ).
+        mo_context->get_message_container( )->add_message_text_only(
+          iv_msg_text = ls_result-message
+          iv_msg_type = 'S' ).
       ENDIF.
       
       " Return result
@@ -215,11 +214,10 @@ METHOD goodsmvtflatset_create_entity.
       ls_result-message = lx_error->get_text( ).
       ls_result-mat_doc_num = ''.
       
-      " Add error message to context
-      /iwbep/cl_mgw_data_util=>message_container_add_message(
-        io_message_container = mo_context->get_message_container( )
-        iv_message_text = ls_result-message
-        iv_message_type = 'E' ).
+             " Add error message to context
+       mo_context->get_message_container( )->add_message_text_only(
+         iv_msg_text = ls_result-message
+         iv_msg_type = 'E' ).
       
       copy_data_to_ref( EXPORTING is_data = ls_result 
                        CHANGING  cr_data = er_entity ).
