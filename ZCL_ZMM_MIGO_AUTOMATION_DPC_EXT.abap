@@ -5,8 +5,8 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
 
   TYPES: BEGIN OF ty_header.
            INCLUDE TYPE zcl_zmm_migo_automation_mpc_ext=>ts_headerdummy.
-  TYPES:   HeaderToGoodsMovementHeader TYPE zcl_zmm_migo_automation_mpc_ext=>ts_goodsmovementheader,
-           HeaderToGoodsMovementItem TYPE ty_items,
+  TYPES:   headertogoodsmovementheader TYPE zcl_zmm_migo_automation_mpc_ext=>ts_goodsmovementheader,
+           headertogoodsmovementitem TYPE ty_items,
          END OF ty_header.
 
   " Data declarations
@@ -53,7 +53,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
   " Initialize response tracking
   lv_created_count = 0.
   lv_failed_count = 0.
-  lv_current_header = iw_data-grgiSlipno.
+  lv_current_header = iw_data-GrGiSlipNo.
 
   " Build JSON response start
   lv_json_response = '{"GrGiSlipNo":"' && lv_current_header && '","Results":['.
@@ -65,7 +65,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     CLEAR: lv_materialdocument, lv_matdocumentyear.
 
     " Validation following business rules
-    IF wa_header-ztypegm <> lc_ztype_gm.
+    IF wa_header-ZtypeGm <> lc_ztype_gm.
       wa_errors-type = 'E'.
       wa_errors-message = 'ZtypeGm must be A007'.
       APPEND wa_errors TO lt_errors.
@@ -74,12 +74,12 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       IF lv_results_json IS NOT INITIAL.
         lv_results_json = lv_results_json && ','.
       ENDIF.
-      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-grgiSlipno && 
+      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-GrGiSlipNo && 
                         '","Status":"FAILED","Error":"ZtypeGm must be A007"}'.
       CONTINUE.
     ENDIF.
 
-    IF wa_header-zsubtype <> lc_zsub_type.
+    IF wa_header-ZsubType <> lc_zsub_type.
       wa_errors-type = 'E'.
       wa_errors-message = 'ZsubType must be R10'.
       APPEND wa_errors TO lt_errors.
@@ -88,12 +88,12 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       IF lv_results_json IS NOT INITIAL.
         lv_results_json = lv_results_json && ','.
       ENDIF.
-      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-grgiSlipno && 
+      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-GrGiSlipNo && 
                         '","Status":"FAILED","Error":"ZsubType must be R10"}'.
       CONTINUE.
     ENDIF.
 
-    IF wa_header-movementtype <> lc_movement_type.
+    IF wa_header-Movementtype <> lc_movement_type.
       wa_errors-type = 'E'.
       wa_errors-message = 'Movement type must be 963'.
       APPEND wa_errors TO lt_errors.
@@ -102,14 +102,14 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       IF lv_results_json IS NOT INITIAL.
         lv_results_json = lv_results_json && ','.
       ENDIF.
-      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-grgiSlipno && 
+      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-GrGiSlipNo && 
                         '","Status":"FAILED","Error":"Movement type must be 963"}'.
       CONTINUE.
     ENDIF.
 
     " Validate mandatory item fields
-    IF wa_item-material IS INITIAL OR wa_item-plant IS INITIAL OR 
-       wa_item-strgLoc IS INITIAL OR wa_item-quantity IS INITIAL.
+    IF wa_item-Material IS INITIAL OR wa_item-Plant IS INITIAL OR 
+       wa_item-StrgLoc IS INITIAL OR wa_item-Quantity IS INITIAL.
       wa_errors-type = 'E'.
       wa_errors-message = 'Mandatory fields missing: Material, Plant, Storage Location, or Quantity'.
       APPEND wa_errors TO lt_errors.
@@ -118,7 +118,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       IF lv_results_json IS NOT INITIAL.
         lv_results_json = lv_results_json && ','.
       ENDIF.
-      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-grgiSlipno && 
+      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-GrGiSlipNo && 
                         '","Status":"FAILED","Error":"Mandatory fields missing"}'.
       CONTINUE.
     ENDIF.
@@ -126,18 +126,18 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     " Prepare BAPI header data
     wa_goodsmvt_header-pstng_date = sy-datum.
     wa_goodsmvt_header-doc_date = sy-datum.
-    wa_goodsmvt_header-header_txt = wa_header-headertxt.
+    wa_goodsmvt_header-header_txt = wa_header-HeaderTxt.
 
     " Prepare BAPI item data
-    wa_goodsmvt_item-material = wa_item-material.
-    wa_goodsmvt_item-plant = wa_item-plant.
-    wa_goodsmvt_item-stge_loc = wa_item-strgLoc.
-    wa_goodsmvt_item-move_type = wa_header-movementtype.
-    wa_goodsmvt_item-entry_qnt = wa_item-quantity.
-    wa_goodsmvt_item-entry_uom = wa_item-baseUom.
-    wa_goodsmvt_item-gl_account = wa_item-glAccount.
-    wa_goodsmvt_item-costcenter = wa_item-costcenter.
-    wa_goodsmvt_item-orderid = wa_item-orderNo.
+    wa_goodsmvt_item-material = wa_item-Material.
+    wa_goodsmvt_item-plant = wa_item-Plant.
+    wa_goodsmvt_item-stge_loc = wa_item-StrgLoc.
+    wa_goodsmvt_item-move_type = wa_header-Movementtype.
+    wa_goodsmvt_item-entry_qnt = wa_item-Quantity.
+    wa_goodsmvt_item-entry_uom = wa_item-BaseUom.
+    wa_goodsmvt_item-gl_account = wa_item-GlAccount.
+    wa_goodsmvt_item-costcenter = wa_item-Costcenter.
+    wa_goodsmvt_item-orderid = wa_item-OrderNo.
     APPEND wa_goodsmvt_item TO it_goodsmvt_item.
 
     " Call BAPI for goods movement creation
@@ -164,13 +164,13 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       ENDIF.
       " Clean error message for JSON
       REPLACE ALL OCCURRENCES OF '"' IN wa_return-message WITH '\"'.
-      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-grgiSlipno && 
+      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-GrGiSlipNo && 
                         '","Status":"FAILED","Error":"' && wa_return-message && '"}'.
       
       " Update item with error info
       LOOP AT iw_data-headertogoodsmovementitem INTO DATA(ls_item).
         IF lv_tabix EQ sy-tabix.
-          ls_item-itemOk = abap_false.
+          ls_item-ItemOk = abap_false.
           MODIFY iw_data-headertogoodsmovementitem FROM ls_item INDEX lv_tabix.
           EXIT.
         ENDIF.
@@ -187,13 +187,13 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       IF lv_results_json IS NOT INITIAL.
         lv_results_json = lv_results_json && ','.
       ENDIF.
-      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-grgiSlipno && 
+      lv_results_json = lv_results_json && '{"GrGiSlipNo":"' && wa_item-GrGiSlipNo && 
                         '","Status":"SUCCESS","MIGONumber":"' && lv_materialdocument && '"}'.
       
       " Update item with success info
       LOOP AT iw_data-headertogoodsmovementitem INTO ls_item.
         IF lv_tabix EQ sy-tabix.
-          ls_item-itemOk = abap_true.
+          ls_item-ItemOk = abap_true.
           MODIFY iw_data-headertogoodsmovementitem FROM ls_item INDEX lv_tabix.
           EXIT.
         ENDIF.
