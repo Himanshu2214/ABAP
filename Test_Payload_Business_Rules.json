@@ -1,0 +1,69 @@
+{
+  "GrGiSlipNo": "AUTO001", 
+  "ToRealHeaders": [
+    {
+      "GrGiSlipNo": "SAMPLE001",
+      "ZtypeGm": "A007",
+      "ZsubType": "R10", 
+      "Movementtype": "963",
+      "DocDate": "2025-01-15T10:30:00",
+      "PstngDate": "2025-01-15T10:30:00",
+      "HeaderTxt": "Goods Issue for Sampling - Batch 1",
+      "HeaderToItemNav": [
+        {
+          "GiGiSlipNo": "SAMPLE001",
+          "ItemNo": "0001",
+          "Material": "MAT001",
+          "MatDesc": "Raw Material Sample A",
+          "BaseUom": "KG",
+          "Quantity": "5.000",
+          "StrgLoc": "0001", 
+          "Plant": "1000",
+          "GlAccount": "400000",
+          "Costcenter": "CC001",
+          "OrderNo": "IO123456",
+          "ItemOk": true
+        },
+        {
+          "GiGiSlipNo": "SAMPLE001", 
+          "ItemNo": "0002",
+          "Material": "MAT002",
+          "MatDesc": "Chemical Sample B",
+          "BaseUom": "EA",
+          "Quantity": "2.000",
+          "StrgLoc": "0002",
+          "Plant": "1000", 
+          "GlAccount": "400001",
+          "Costcenter": "CC002",
+          "OrderNo": "IO123457",
+          "ItemOk": true
+        }
+      ]
+    },
+    {
+      "GrGiSlipNo": "SAMPLE002",
+      "ZtypeGm": "A007",
+      "ZsubType": "R10",
+      "Movementtype": "963", 
+      "DocDate": "2025-01-15T10:30:00",
+      "PstngDate": "2025-01-15T10:30:00",
+      "HeaderTxt": "Goods Issue for Sampling - Batch 2",
+      "HeaderToItemNav": [
+        {
+          "GiGiSlipNo": "SAMPLE002",
+          "ItemNo": "0001", 
+          "Material": "MAT003",
+          "MatDesc": "Testing Material C",
+          "BaseUom": "L",
+          "Quantity": "10.000",
+          "StrgLoc": "0003",
+          "Plant": "1000",
+          "GlAccount": "400002", 
+          "Costcenter": "CC003",
+          "OrderNo": "IO123458",
+          "ItemOk": true
+        }
+      ]
+    }
+  ]
+}
