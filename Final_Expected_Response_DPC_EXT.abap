@@ -17,7 +17,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
 
   TYPES: ty_headers TYPE STANDARD TABLE OF ty_header WITH DEFAULT KEY.
 
-  " Result record structure (unified for success and failure)
+  " Result record structure (unified for success and failure) - UPPERCASE field names
   TYPES: BEGIN OF ty_result_record,
            grgislipno TYPE string,
            status TYPE string,
@@ -25,7 +25,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
            error TYPE string,
          END OF ty_result_record.
 
-  " Expected response structure
+  " Expected response structure - UPPERCASE field names  
   TYPES: BEGIN OF ty_response,
            grgislipno TYPE string,
            overallstatus TYPE string,
@@ -388,37 +388,48 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     ls_response-overallstatus = 'PARTIAL SUCCESS'.
   ENDIF.
 
-  " Step 8: Handle HTTP status codes based on results
-  IF lv_success_count = 0.
-    " All records failed - return HTTP 400 with error details
-    " Convert response to JSON using /UI2/CL_JSON (more reliable for string output)
-    lv_response_json = /ui2/cl_json=>serialize( data = ls_response compress = abap_false pretty_name = /ui2/cl_json=>pretty_mode-camel_case ).
-    
-    RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-      EXPORTING
-        textid = /iwbep/cx_mgw_busi_exception=>business_error
-        message = lv_response_json
-        http_status_code = /iwbep/cx_mgw_busi_exception=>gcs_http_status_codes-bad_request.
-
-  ELSEIF lv_error_count > 0.
-    " Partial success - return HTTP 207 Multi-Status with mixed results
-    " Convert response to JSON using /UI2/CL_JSON
-    lv_response_json = /ui2/cl_json=>serialize( data = ls_response compress = abap_false pretty_name = /ui2/cl_json=>pretty_mode-camel_case ).
-    
-    RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-      EXPORTING
-        textid = /iwbep/cx_mgw_busi_exception=>business_error
-        message = lv_response_json
-        http_status_code = '207'.  " Multi-Status
+  " Step 8: Return clean response structure (HTTP 200 for all cases)
+  " Create final response with UPPERCASE field names
+  TYPES: BEGIN OF ty_final_result,
+           grgislipno TYPE string,
+           status TYPE string,
+           migonumber TYPE string,
+           error TYPE string,
+         END OF ty_final_result,
+         ty_final_results TYPE STANDARD TABLE OF ty_final_result WITH DEFAULT KEY.
+         
+  TYPES: BEGIN OF ty_final_response_data,
+           grgislipno TYPE string,
+           overallstatus TYPE string,
+           results TYPE ty_final_results,
+         END OF ty_final_response_data.
+         
+  TYPES: BEGIN OF ty_final_response,
+           response TYPE ty_final_response_data,
+         END OF ty_final_response.
+         
+  DATA: ls_final_response TYPE ty_final_response,
+        ls_final_result TYPE ty_final_result.
         
-  ELSE.
-    " All records successful - return HTTP 201 with success response
-    copy_data_to_ref(
-      EXPORTING
-        is_data = ls_response
-      CHANGING
-        cr_data = er_deep_entity
-    ).
-  ENDIF.
+  " Map response data
+  ls_final_response-response-grgislipno = ls_response-grgislipno.
+  ls_final_response-response-overallstatus = ls_response-overallstatus.
+  
+  " Map results array
+  LOOP AT ls_response-results INTO ls_result_record.
+    CLEAR: ls_final_result.
+    ls_final_result-grgislipno = ls_result_record-grgislipno.
+    ls_final_result-status = ls_result_record-status.
+    ls_final_result-migonumber = ls_result_record-migonumber.
+    ls_final_result-error = ls_result_record-error.
+    APPEND ls_final_result TO ls_final_response-response-results.
+  ENDLOOP.
+  
+  copy_data_to_ref(
+    EXPORTING
+      is_data = ls_final_response
+    CHANGING
+      cr_data = er_deep_entity
+  ).
 
 ENDMETHOD.
