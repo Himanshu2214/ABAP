@@ -391,12 +391,8 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
   " Step 8: Handle HTTP status codes based on results
   IF lv_success_count = 0.
     " All records failed - return HTTP 400 with error details
-    " Convert response to JSON using SXML transformation
-    DATA(lo_writer) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
-    CALL TRANSFORMATION id
-      SOURCE response = ls_response
-      RESULT XML lo_writer.
-    lv_response_json = lo_writer->get_output( ).
+    " Convert response to JSON using /UI2/CL_JSON (more reliable for string output)
+    lv_response_json = /ui2/cl_json=>serialize( data = ls_response compress = abap_false pretty_name = /ui2/cl_json=>pretty_mode-camel_case ).
     
     RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
       EXPORTING
@@ -406,12 +402,8 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
 
   ELSEIF lv_error_count > 0.
     " Partial success - return HTTP 207 Multi-Status with mixed results
-    " Convert response to JSON using SXML transformation
-    DATA(lo_writer_partial) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
-    CALL TRANSFORMATION id
-      SOURCE response = ls_response
-      RESULT XML lo_writer_partial.
-    lv_response_json = lo_writer_partial->get_output( ).
+    " Convert response to JSON using /UI2/CL_JSON
+    lv_response_json = /ui2/cl_json=>serialize( data = ls_response compress = abap_false pretty_name = /ui2/cl_json=>pretty_mode-camel_case ).
     
     RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
       EXPORTING
