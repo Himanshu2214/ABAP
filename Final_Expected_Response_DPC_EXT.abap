@@ -391,25 +391,12 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
   " Step 8: Handle HTTP status codes based on results
   IF lv_success_count = 0.
     " All records failed - return HTTP 400 with error details
-    " Convert response to JSON string for error message
-    " (In real implementation, you might want to use proper JSON serialization)
-    lv_response_json = |{ '{"GrGiSlipNo":"' }{ ls_response-grgislipno }{ '","OverallStatus":"' }{ ls_response-overallstatus }{ '","Results":[' }|.
-    
-    LOOP AT ls_response-results INTO ls_result_record.
-      IF sy-tabix > 1.
-        lv_response_json = |{ lv_response_json },|.
-      ENDIF.
-      lv_response_json = |{ lv_response_json }{ '{"GrGiSlipNo":"' }{ ls_result_record-grgislipno }{ '","Status":"' }{ ls_result_record-status }{ '"' }|.
-      IF ls_result_record-error IS NOT INITIAL.
-        lv_response_json = |{ lv_response_json },{ '"Error":"' }{ ls_result_record-error }{ '"' }|.
-      ENDIF.
-      IF ls_result_record-migonumber IS NOT INITIAL.
-        lv_response_json = |{ lv_response_json },{ '"MIGONumber":"' }{ ls_result_record-migonumber }{ '"' }|.
-      ENDIF.
-      lv_response_json = |{ lv_response_json }}|.
-    ENDLOOP.
-    
-    lv_response_json = |{ lv_response_json }]}|.
+    " Convert response to JSON using SXML transformation
+    DATA(lo_writer) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
+    CALL TRANSFORMATION id
+      SOURCE response = ls_response
+      RESULT XML lo_writer.
+    lv_response_json = lo_writer->get_output( ).
     
     RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
       EXPORTING
@@ -419,23 +406,12 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
 
   ELSEIF lv_error_count > 0.
     " Partial success - return HTTP 207 Multi-Status with mixed results
-    lv_response_json = |{ '{"GrGiSlipNo":"' }{ ls_response-grgislipno }{ '","OverallStatus":"' }{ ls_response-overallstatus }{ '","Results":[' }|.
-    
-    LOOP AT ls_response-results INTO ls_result_record.
-      IF sy-tabix > 1.
-        lv_response_json = |{ lv_response_json },|.
-      ENDIF.
-      lv_response_json = |{ lv_response_json }{ '{"GrGiSlipNo":"' }{ ls_result_record-grgislipno }{ '","Status":"' }{ ls_result_record-status }{ '"' }|.
-      IF ls_result_record-error IS NOT INITIAL.
-        lv_response_json = |{ lv_response_json },{ '"Error":"' }{ ls_result_record-error }{ '"' }|.
-      ENDIF.
-      IF ls_result_record-migonumber IS NOT INITIAL.
-        lv_response_json = |{ lv_response_json },{ '"MIGONumber":"' }{ ls_result_record-migonumber }{ '"' }|.
-      ENDIF.
-      lv_response_json = |{ lv_response_json }}|.
-    ENDLOOP.
-    
-    lv_response_json = |{ lv_response_json }]}|.
+    " Convert response to JSON using SXML transformation
+    DATA(lo_writer_partial) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
+    CALL TRANSFORMATION id
+      SOURCE response = ls_response
+      RESULT XML lo_writer_partial.
+    lv_response_json = lo_writer_partial->get_output( ).
     
     RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
       EXPORTING
