@@ -73,9 +73,13 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
           es_data = ls_deep_entity
       ).
     CATCH cx_root INTO DATA(lx_read_error).
-      RAISE EXCEPTION TYPE /iwbep/cx_mgw_tech_exception
+      " Debug: Show what went wrong with data reading
+      lv_response_json = |Error reading payload: { lx_read_error->get_text( ) }|.
+      RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
-          textid = /iwbep/cx_mgw_tech_exception=>internal_error.
+          textid = /iwbep/cx_mgw_busi_exception=>business_error
+          message = lv_response_json
+          http_status_code = '400'.
   ENDTRY.
 
   " Initialize response
@@ -84,12 +88,24 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
   " Count total headers
   lv_total_headers = lines( ls_deep_entity-torealheaders ).
 
-  " Validate main payload
-  IF ls_deep_entity-grgislipno IS INITIAL.
+  " Debug: Check if data was read properly
+  IF ls_deep_entity-grgislipno IS INITIAL AND lv_total_headers = 0.
+    lv_response_json = |{"ERROR": "No data received in payload. Check payload structure and field names."}|.
     RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
       EXPORTING
         textid = /iwbep/cx_mgw_busi_exception=>business_error
-        message = 'Main GrGiSlipNo is required'.
+        message = lv_response_json
+        http_status_code = '400'.
+  ENDIF.
+
+  " Validate main payload
+  IF ls_deep_entity-grgislipno IS INITIAL.
+    lv_response_json = |{"ERROR": "Main GrGiSlipNo is required in payload"}|.
+    RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+      EXPORTING
+        textid = /iwbep/cx_mgw_busi_exception=>business_error
+        message = lv_response_json
+        http_status_code = '400'.
   ENDIF.
 
   " Step 3: Process each real header with validation
@@ -388,8 +404,8 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     ls_response-overallstatus = 'PARTIAL SUCCESS'.
   ENDIF.
 
-  " Step 8: Return clean response structure (HTTP 200 for all cases)
-  " Create final response with UPPERCASE field names
+  " Step 8: Return custom response via exception with proper JSON format
+  " Create final response with UPPERCASE field names as requested
   TYPES: BEGIN OF ty_final_result,
            grgislipno TYPE string,
            status TYPE string,
@@ -425,11 +441,28 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     APPEND ls_final_result TO ls_final_response-response-results.
   ENDLOOP.
   
-  copy_data_to_ref(
-    EXPORTING
-      is_data = ls_final_response
-    CHANGING
-      cr_data = er_deep_entity
+  " Convert to JSON and return via exception to get clean format
+  lv_response_json = /ui2/cl_json=>serialize( 
+    data = ls_final_response 
+    compress = abap_false 
+    pretty_name = /ui2/cl_json=>pretty_mode-upper_case 
   ).
+  
+  " Determine HTTP status code based on results
+  DATA: lv_http_status TYPE string.
+  IF lv_success_count = 0.
+    lv_http_status = '400'.  " Bad Request - all failed
+  ELSEIF lv_error_count = 0.
+    lv_http_status = '200'.  " OK - all success  
+  ELSE.
+    lv_http_status = '207'.  " Multi-Status - partial success
+  ENDIF.
+  
+  " Always throw exception to return clean JSON (not OData wrapped)
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+    EXPORTING
+      textid = /iwbep/cx_mgw_busi_exception=>business_error
+      message = lv_response_json
+      http_status_code = lv_http_status.
 
 ENDMETHOD.
