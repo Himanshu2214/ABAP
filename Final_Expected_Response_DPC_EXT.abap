@@ -62,6 +62,10 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
   " Validation table for unique GrGiSlipNo
   DATA: lt_processed_slips TYPE TABLE OF string.
 
+  " Error response message for exception
+  DATA: lv_exception_message TYPE string,
+        lv_response_json TYPE string.
+
   " Step 2: Read full deep structure
   TRY.
       io_data_provider->read_entry_data(
@@ -326,10 +330,10 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
           goodsmvt_item        = lt_gm_items
           return               = lt_return.
 
-      " Check for errors
+      " Check for BAPI errors in LT_RETURN (SY-SUBRC is always 0)
       READ TABLE lt_return INTO ls_return WITH KEY type = 'E'.
       IF sy-subrc = 0.
-        " Error occurred - rollback
+        " Error occurred in BAPI - rollback
         CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
         lv_error_count = lv_error_count + 1.
 
@@ -349,7 +353,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
         APPEND ls_result_record TO ls_response-results.
 
       ELSE.
-        " Success - commit
+        " No errors in LT_RETURN - check for warnings and commit
         CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
           EXPORTING
             wait = 'X'.
@@ -384,12 +388,69 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     ls_response-overallstatus = 'PARTIAL SUCCESS'.
   ENDIF.
 
-  " Step 8: Return the response structure
-  copy_data_to_ref(
-    EXPORTING
-      is_data = ls_response
-    CHANGING
-      cr_data = er_deep_entity
-  ).
+  " Step 8: Handle HTTP status codes based on results
+  IF lv_success_count = 0.
+    " All records failed - return HTTP 400 with error details
+    " Convert response to JSON string for error message
+    " (In real implementation, you might want to use proper JSON serialization)
+    lv_response_json = |{ '{"GrGiSlipNo":"' }{ ls_response-grgislipno }{ '","OverallStatus":"' }{ ls_response-overallstatus }{ '","Results":[' }|.
+    
+    LOOP AT ls_response-results INTO ls_result_record.
+      IF sy-tabix > 1.
+        lv_response_json = |{ lv_response_json },|.
+      ENDIF.
+      lv_response_json = |{ lv_response_json }{ '{"GrGiSlipNo":"' }{ ls_result_record-grgislipno }{ '","Status":"' }{ ls_result_record-status }{ '"' }|.
+      IF ls_result_record-error IS NOT INITIAL.
+        lv_response_json = |{ lv_response_json },{ '"Error":"' }{ ls_result_record-error }{ '"' }|.
+      ENDIF.
+      IF ls_result_record-migonumber IS NOT INITIAL.
+        lv_response_json = |{ lv_response_json },{ '"MIGONumber":"' }{ ls_result_record-migonumber }{ '"' }|.
+      ENDIF.
+      lv_response_json = |{ lv_response_json }}|.
+    ENDLOOP.
+    
+    lv_response_json = |{ lv_response_json }]}|.
+    
+    RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+      EXPORTING
+        textid = /iwbep/cx_mgw_busi_exception=>business_error
+        message = lv_response_json
+        http_status_code = /iwbep/cx_mgw_busi_exception=>gcs_http_status_codes-bad_request.
+
+  ELSEIF lv_error_count > 0.
+    " Partial success - return HTTP 207 Multi-Status with mixed results
+    lv_response_json = |{ '{"GrGiSlipNo":"' }{ ls_response-grgislipno }{ '","OverallStatus":"' }{ ls_response-overallstatus }{ '","Results":[' }|.
+    
+    LOOP AT ls_response-results INTO ls_result_record.
+      IF sy-tabix > 1.
+        lv_response_json = |{ lv_response_json },|.
+      ENDIF.
+      lv_response_json = |{ lv_response_json }{ '{"GrGiSlipNo":"' }{ ls_result_record-grgislipno }{ '","Status":"' }{ ls_result_record-status }{ '"' }|.
+      IF ls_result_record-error IS NOT INITIAL.
+        lv_response_json = |{ lv_response_json },{ '"Error":"' }{ ls_result_record-error }{ '"' }|.
+      ENDIF.
+      IF ls_result_record-migonumber IS NOT INITIAL.
+        lv_response_json = |{ lv_response_json },{ '"MIGONumber":"' }{ ls_result_record-migonumber }{ '"' }|.
+      ENDIF.
+      lv_response_json = |{ lv_response_json }}|.
+    ENDLOOP.
+    
+    lv_response_json = |{ lv_response_json }]}|.
+    
+    RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+      EXPORTING
+        textid = /iwbep/cx_mgw_busi_exception=>business_error
+        message = lv_response_json
+        http_status_code = '207'.  " Multi-Status
+        
+  ELSE.
+    " All records successful - return HTTP 201 with success response
+    copy_data_to_ref(
+      EXPORTING
+        is_data = ls_response
+      CHANGING
+        cr_data = er_deep_entity
+    ).
+  ENDIF.
 
 ENDMETHOD.
