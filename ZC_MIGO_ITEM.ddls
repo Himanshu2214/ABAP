@@ -1,0 +1,33 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'MIGO Item Consumption View'
+@Metadata.allowExtensions: true
+define view entity ZC_MIGO_ITEM as projection on ZI_MIGO_ITEM
+{
+  key Client,
+  key RequestId,
+  key ItemSequence,
+  GrGiSlipNo,
+  ZtypeGm,
+  ZsubType,
+  Movementtype,
+  DocDate,
+  PstngDate,
+  HeaderTxt,
+  ItemNo,
+  Material,
+  MatDesc,
+  BaseUom,
+  Quantity,
+  StrgLoc,
+  Plant,
+  GlAccount,
+  Costcenter,
+  OrderNo,
+  ItemOk,
+  Status,
+  Message,
+  MigoDocNo,
+  
+  /* Associations */
+  _Parent : redirected to parent ZC_MIGO_BATCH_POSTING
+}

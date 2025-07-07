@@ -1,0 +1,16 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'MIGO Batch Posting Interface View'
+define root view entity ZI_MIGO_BATCH_POSTING as select from DUMMY_TABLE 
+{
+  key client as Client,
+  key cast( '00000000000000000000000000000001' as abap.numc( 32 ) ) as RequestId,
+  cast( '' as abap.char( 255 ) ) as Header,
+  cast( '' as abap.char( 10 ) ) as Status,
+  cast( '' as abap.char( 255 ) ) as Message,
+  cast( '' as abap.char( 20 ) ) as MaterialDocument,
+  cast( '00000000' as abap.dats ) as ProcessedDate,
+  cast( '000000' as abap.tims ) as ProcessedTime
+}
+
+// Association to child items
+composition [0..*] of ZI_MIGO_ITEM as _Items;

@@ -1,0 +1,21 @@
+projection;
+strict ( 2 );
+
+define behavior for ZC_MIGO_BATCH_POSTING alias MigoBatchPostingConsumption
+{
+  use create;
+  use update;
+  use delete;
+  
+  use action processMigoPosting;
+  
+  use composition _Items;
+}
+
+define behavior for ZC_MIGO_ITEM alias MigoItemConsumption
+{
+  use update;
+  use delete;
+  
+  use association _Parent;
+}

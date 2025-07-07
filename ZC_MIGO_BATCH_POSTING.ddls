@@ -1,0 +1,17 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'MIGO Batch Posting Consumption View'
+@Metadata.allowExtensions: true
+define root view entity ZC_MIGO_BATCH_POSTING as projection on ZI_MIGO_BATCH_POSTING
+{
+  key Client,
+  key RequestId,
+  Header,
+  Status,
+  Message,
+  MaterialDocument,
+  ProcessedDate,
+  ProcessedTime,
+  
+  /* Associations */
+  _Items : redirected to composition child ZC_MIGO_ITEM
+}

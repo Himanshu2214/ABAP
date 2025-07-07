@@ -1,0 +1,5 @@
+@EndUserText.label: 'MIGO Batch Posting Service Binding'
+@Metadata.allowExtensions: true
+define service binding ZUI_MIGO_BATCH_POSTING_O4 {
+  expose ZUI_MIGO_BATCH_POSTING_O4 as 'MigoBatchPosting';
+}

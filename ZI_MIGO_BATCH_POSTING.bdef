@@ -1,0 +1,63 @@
+managed implementation in class zbp_i_migo_batch_posting unique;
+strict ( 2 );
+
+define behavior for ZI_MIGO_BATCH_POSTING alias MigoBatchPosting
+persistent table DUMMY_TABLE
+lock master
+authorization master ( instance )
+{
+  create;
+  update;
+  delete;
+  
+  action processMigoPosting parameter ZI_MIGO_BATCH_POSTING result [1] $self;
+  
+  composition [0..*] of ZI_MIGO_ITEM as _Items;
+  
+  mapping for DUMMY_TABLE {
+    RequestId = request_id;
+    Header = header;
+    Status = status;
+    Message = message;
+    MaterialDocument = material_document;
+    ProcessedDate = processed_date;
+    ProcessedTime = processed_time;
+  }
+}
+
+define behavior for ZI_MIGO_ITEM alias MigoItem
+persistent table DUMMY_TABLE
+lock dependent by _Parent
+authorization dependent by _Parent
+{
+  update;
+  delete;
+  
+  association _Parent { create; }
+  
+  mapping for DUMMY_TABLE {
+    RequestId = request_id;
+    ItemSequence = item_sequence;
+    GrGiSlipNo = gr_gi_slip_no;
+    ZtypeGm = ztype_gm;
+    ZsubType = zsub_type;
+    Movementtype = movement_type;
+    DocDate = doc_date;
+    PstngDate = pstng_date;
+    HeaderTxt = header_txt;
+    ItemNo = item_no;
+    Material = material;
+    MatDesc = mat_desc;
+    BaseUom = base_uom;
+    Quantity = quantity;
+    StrgLoc = strg_loc;
+    Plant = plant;
+    GlAccount = gl_account;
+    Costcenter = cost_center;
+    OrderNo = order_no;
+    ItemOk = item_ok;
+    Status = status;
+    Message = message;
+    MigoDocNo = migo_doc_no;
+  }
+}

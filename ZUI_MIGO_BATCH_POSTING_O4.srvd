@@ -1,0 +1,5 @@
+@EndUserText.label: 'MIGO Batch Posting Service Definition'
+define service ZUI_MIGO_BATCH_POSTING_O4 {
+  expose ZC_MIGO_BATCH_POSTING as MigoBatchPosting;
+  expose ZC_MIGO_ITEM as MigoItem;
+}

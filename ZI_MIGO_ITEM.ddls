@@ -1,0 +1,32 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'MIGO Item Interface View'
+define view entity ZI_MIGO_ITEM as select from DUMMY_TABLE
+association to parent ZI_MIGO_BATCH_POSTING as _Parent on $projection.RequestId = _Parent.RequestId
+{
+  key client as Client,
+  key cast( '00000000000000000000000000000001' as abap.numc( 32 ) ) as RequestId,
+  key cast( '00000' as abap.numc( 5 ) ) as ItemSequence,
+  cast( '' as abap.char( 20 ) ) as GrGiSlipNo,
+  cast( '' as abap.char( 10 ) ) as ZtypeGm,
+  cast( '' as abap.char( 10 ) ) as ZsubType,
+  cast( '' as abap.char( 3 ) ) as Movementtype,
+  cast( '00000000' as abap.dats ) as DocDate,
+  cast( '00000000' as abap.dats ) as PstngDate,
+  cast( '' as abap.char( 50 ) ) as HeaderTxt,
+  cast( '' as abap.char( 5 ) ) as ItemNo,
+  cast( '' as abap.char( 40 ) ) as Material,
+  cast( '' as abap.char( 40 ) ) as MatDesc,
+  cast( '' as abap.char( 3 ) ) as BaseUom,
+  cast( '0.000' as abap.quan( 13, 3 ) ) as Quantity,
+  cast( '' as abap.char( 4 ) ) as StrgLoc,
+  cast( '' as abap.char( 4 ) ) as Plant,
+  cast( '' as abap.char( 10 ) ) as GlAccount,
+  cast( '' as abap.char( 10 ) ) as Costcenter,
+  cast( '' as abap.char( 12 ) ) as OrderNo,
+  cast( 'X' as abap_boolean ) as ItemOk,
+  cast( '' as abap.char( 10 ) ) as Status,
+  cast( '' as abap.char( 255 ) ) as Message,
+  cast( '' as abap.char( 20 ) ) as MigoDocNo,
+  
+  _Parent
+}
