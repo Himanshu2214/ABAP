@@ -28,8 +28,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
       EXPORTING
         textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-        message = 'ZMATSet is empty in the request payload.'
-        http_status_code = '400'.
+        message = 'ZMATSet is empty in the request payload.'.
   ENDIF.
 
   " Sort item data for better performance in loops
@@ -47,8 +46,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
       EXPORTING
         textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-        message = 'No GrGiSlipNo found in ZMATSet items to process.'
-        http_status_code = '400'.
+        message = 'No GrGiSlipNo found in ZMATSet items to process.'.
   ENDIF.
 
   " FAIL FAST VALIDATION - Stop at first error
@@ -59,32 +57,28 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |Plant must not be blank for GrGiSlipNo { ls_check-grgislipno }|
-          http_status_code = '400'.
+          message = |Plant must not be blank for GrGiSlipNo { ls_check-grgislipno }|.
     ENDIF.
 
     IF ls_check-grgislipno IS INITIAL.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |GrGiSlipNo must not be blank for item { ls_check-itemno }|
-          http_status_code = '400'.
+          message = |GrGiSlipNo must not be blank for item { ls_check-itemno }|.
     ENDIF.
 
     IF ls_check-docdate IS INITIAL.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |DocDate must not be blank for GrGiSlipNo { ls_check-grgislipno }|
-          http_status_code = '400'.
+          message = |DocDate must not be blank for GrGiSlipNo { ls_check-grgislipno }|.
     ENDIF.
 
     IF ls_check-pstngdate IS INITIAL.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |PstngDate must not be blank for GrGiSlipNo { ls_check-grgislipno }|
-          http_status_code = '400'.
+          message = |PstngDate must not be blank for GrGiSlipNo { ls_check-grgislipno }|.
     ENDIF.
 
     " Material validation with proper conversion
@@ -92,8 +86,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |Material must not be blank for GrGiSlipNo { ls_check-grgislipno }|
-          http_status_code = '400'.
+          message = |Material must not be blank for GrGiSlipNo { ls_check-grgislipno }|.
     ELSE.
       " Use proper material conversion
       DATA(lv_material) = ls_check-material.
@@ -113,8 +106,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
             textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-            message = |Material { ls_check-material } is not maintained in Plant { ls_check-plant } (MARC check failed)|
-            http_status_code = '400'.
+            message = |Material { ls_check-material } is not maintained in Plant { ls_check-plant } (MARC check failed)|.
       ENDIF.
     ENDIF.
 
@@ -124,8 +116,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |ItemOk must be true to process the item for GrGiSlipNo { ls_check-grgislipno }|
-          http_status_code = '400'.
+          message = |ItemOk must be true to process the item for GrGiSlipNo { ls_check-grgislipno }|.
     ENDIF.
 
     " Quantity validation
@@ -133,8 +124,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |Quantity must be greater than zero for item { ls_check-itemno }|
-          http_status_code = '400'.
+          message = |Quantity must be greater than zero for item { ls_check-itemno }|.
     ENDIF.
 
     " Movement type validation
@@ -142,8 +132,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |Movement type is required for item { ls_check-itemno }|
-          http_status_code = '400'.
+          message = |Movement type is required for item { ls_check-itemno }|.
     ELSE.
       " Validate movement type exists
       SELECT SINGLE bwart FROM t156
@@ -154,8 +143,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
             textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-            message = |Invalid movement type { ls_check-movementtype } for item { ls_check-itemno }|
-            http_status_code = '400'.
+            message = |Invalid movement type { ls_check-movementtype } for item { ls_check-itemno }|.
       ENDIF.
     ENDIF.
 
@@ -169,8 +157,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
             textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-            message = |Invalid unit of measure { ls_check-baseuom } for item { ls_check-itemno }|
-            http_status_code = '400'.
+            message = |Invalid unit of measure { ls_check-baseuom } for item { ls_check-itemno }|.
       ENDIF.
     ENDIF.
 
@@ -185,8 +172,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
             textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-            message = |Storage location { ls_check-strgloc } not valid for plant { ls_check-plant }|
-            http_status_code = '400'.
+            message = |Storage location { ls_check-strgloc } not valid for plant { ls_check-plant }|.
       ENDIF.
     ENDIF.
 
@@ -200,8 +186,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
             textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-            message = |Invalid GL account { ls_check-glaccount } for item { ls_check-itemno }|
-            http_status_code = '400'.
+            message = |Invalid GL account { ls_check-glaccount } for item { ls_check-itemno }|.
       ENDIF.
     ENDIF.
 
@@ -217,8 +202,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
             textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-            message = |Invalid or inactive cost center { ls_check-costcenter } for item { ls_check-itemno }|
-            http_status_code = '400'.
+            message = |Invalid or inactive cost center { ls_check-costcenter } for item { ls_check-itemno }|.
       ENDIF.
     ENDIF.
 
@@ -232,12 +216,9 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
         RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
           EXPORTING
             textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-            message = |Invalid order number { ls_check-orderno } for item { ls_check-itemno }|
-            http_status_code = '400'.
+            message = |Invalid order number { ls_check-orderno } for item { ls_check-itemno }|.
       ENDIF.
     ENDIF.
-
-    
 
     " Enhanced duplicate slip number check
     SELECT SINGLE mblnr FROM mkpf
@@ -248,8 +229,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |GrGiSlipNo { ls_check-grgislipno } already exists in SAP system|
-          http_status_code = '400'.
+          message = |GrGiSlipNo { ls_check-grgislipno } already exists in SAP system|.
     ENDIF.
 
   ENDLOOP.
@@ -281,126 +261,117 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     " Get header fields from first item of the current group
     READ TABLE lt_group_items INTO DATA(ls_first_item_in_group) INDEX 1.
     IF sy-subrc = 0.
-             TRY.
-           " Enhanced date conversion with better error handling
-           lv_str = ls_first_item_in_group-docdate.
-           " Convert DocDate
-           IF lv_str CS '/Date(' AND lv_str CS ')/' .
-             " Handle JSON date format /Date(timestamp)/
-             REPLACE '/Date(' IN lv_str WITH ''.
-             REPLACE ')/' IN lv_str WITH ''.
-             " Validate timestamp is numeric
-             IF lv_str CO '0123456789'.
-               DATA(lv_timestamp) = CONV int8( lv_str ).
-               lv_timestamp = lv_timestamp / 1000. " Convert to seconds
-               " Validate timestamp range (between 1970 and 2099)
-               IF lv_timestamp BETWEEN 0 AND 4102444800.
-                 lv_doc_date = '19700101'.
-                 lv_doc_date = lv_doc_date + ( lv_timestamp / 86400 ).
-               ELSE.
-                 RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                   EXPORTING
-                     textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-                     message = |Invalid timestamp range in DocDate: { ls_first_item_in_group-docdate }|
-                     http_status_code = '400'.
-               ENDIF.
-             ELSE.
-               RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                 EXPORTING
-                   textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-                   message = |Non-numeric timestamp in DocDate: { ls_first_item_in_group-docdate }|
-                   http_status_code = '400'.
-             ENDIF.
-           ELSE.
-             " Handle regular date format (YYYYMMDD)
-             REPLACE ALL OCCURRENCES OF REGEX `[^0-9]` IN lv_str WITH ``.
-             IF strlen( lv_str ) >= 8.
-               lv_doc_date = lv_str(8).
-               " Validate date
-               CALL FUNCTION 'DATE_CHECK_PLAUSIBILITY'
-                 EXPORTING
-                   date = lv_doc_date
-                 EXCEPTIONS
-                   plausibility_check_failed = 1.
-               IF sy-subrc <> 0.
-                 RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                   EXPORTING
-                     textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-                     message = |Invalid DocDate format: { ls_first_item_in_group-docdate }|
-                     http_status_code = '400'.
-               ENDIF.
-             ELSE.
-               RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                 EXPORTING
-                   textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-                   message = |Invalid DocDate format: { ls_first_item_in_group-docdate }|
-                   http_status_code = '400'.
-             ENDIF.
-           ENDIF.
+      TRY.
+          " Enhanced date conversion with better error handling
+          lv_str = ls_first_item_in_group-docdate.
+          " Convert DocDate
+          IF lv_str CS '/Date(' AND lv_str CS ')/' .
+            " Handle JSON date format /Date(timestamp)/
+            REPLACE '/Date(' IN lv_str WITH ''.
+            REPLACE ')/' IN lv_str WITH ''.
+            " Validate timestamp is numeric
+            IF lv_str CO '0123456789'.
+              DATA(lv_timestamp) = CONV int8( lv_str ).
+              lv_timestamp = lv_timestamp / 1000. " Convert to seconds
+              " Validate timestamp range (between 1970 and 2099)
+              IF lv_timestamp BETWEEN 0 AND 4102444800.
+                lv_doc_date = '19700101'.
+                lv_doc_date = lv_doc_date + ( lv_timestamp / 86400 ).
+              ELSE.
+                RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                  EXPORTING
+                    textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                    message = |Invalid timestamp range in DocDate: { ls_first_item_in_group-docdate }|.
+              ENDIF.
+            ELSE.
+              RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                EXPORTING
+                  textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                  message = |Non-numeric timestamp in DocDate: { ls_first_item_in_group-docdate }|.
+            ENDIF.
+          ELSE.
+            " Handle regular date format (YYYYMMDD)
+            REPLACE ALL OCCURRENCES OF REGEX `[^0-9]` IN lv_str WITH ``.
+            IF strlen( lv_str ) >= 8.
+              lv_doc_date = lv_str(8).
+              " Validate date
+              CALL FUNCTION 'DATE_CHECK_PLAUSIBILITY'
+                EXPORTING
+                  date = lv_doc_date
+                EXCEPTIONS
+                  plausibility_check_failed = 1.
+              IF sy-subrc <> 0.
+                RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                  EXPORTING
+                    textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                    message = |Invalid DocDate format: { ls_first_item_in_group-docdate }|.
+              ENDIF.
+            ELSE.
+              RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                EXPORTING
+                  textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                  message = |Invalid DocDate format: { ls_first_item_in_group-docdate }|.
+            ENDIF.
+          ENDIF.
 
-           " Same for posting date
-           lv_str = ls_first_item_in_group-pstngdate.
-           " Convert PstngDate
-           IF lv_str CS '/Date(' AND lv_str CS ')/' .
-             " Handle JSON date format /Date(timestamp)/
-             REPLACE '/Date(' IN lv_str WITH ''.
-             REPLACE ')/' IN lv_str WITH ''.
-             " Validate timestamp is numeric
-             IF lv_str CO '0123456789'.
-               lv_timestamp = CONV int8( lv_str ).
-               lv_timestamp = lv_timestamp / 1000. " Convert to seconds
-               " Validate timestamp range (between 1970 and 2099)
-               IF lv_timestamp BETWEEN 0 AND 4102444800.
-                 lv_pstng_date = '19700101'.
-                 lv_pstng_date = lv_pstng_date + ( lv_timestamp / 86400 ).
-               ELSE.
-                 RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                   EXPORTING
-                     textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-                     message = |Invalid timestamp range in PstngDate: { ls_first_item_in_group-pstngdate }|
-                     http_status_code = '400'.
-               ENDIF.
-             ELSE.
-               RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                 EXPORTING
-                   textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-                   message = |Non-numeric timestamp in PstngDate: { ls_first_item_in_group-pstngdate }|
-                   http_status_code = '400'.
-             ENDIF.
-           ELSE.
-             " Handle regular date format (YYYYMMDD)
-             REPLACE ALL OCCURRENCES OF REGEX `[^0-9]` IN lv_str WITH ``.
-             IF strlen( lv_str ) >= 8.
-               lv_pstng_date = lv_str(8).
-               " Validate date
-               CALL FUNCTION 'DATE_CHECK_PLAUSIBILITY'
-                 EXPORTING
-                   date = lv_pstng_date
-                 EXCEPTIONS
-                   plausibility_check_failed = 1.
-               IF sy-subrc <> 0.
-                 RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                   EXPORTING
-                     textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-                     message = |Invalid PstngDate format: { ls_first_item_in_group-pstngdate }|
-                     http_status_code = '400'.
-               ENDIF.
-             ELSE.
-               RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-                 EXPORTING
-                   textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-                   message = |Invalid PstngDate format: { ls_first_item_in_group-pstngdate }|
-                   http_status_code = '400'.
-             ENDIF.
-           ENDIF.
+          " Same for posting date
+          lv_str = ls_first_item_in_group-pstngdate.
+          " Convert PstngDate
+          IF lv_str CS '/Date(' AND lv_str CS ')/' .
+            " Handle JSON date format /Date(timestamp)/
+            REPLACE '/Date(' IN lv_str WITH ''.
+            REPLACE ')/' IN lv_str WITH ''.
+            " Validate timestamp is numeric
+            IF lv_str CO '0123456789'.
+              lv_timestamp = CONV int8( lv_str ).
+              lv_timestamp = lv_timestamp / 1000. " Convert to seconds
+              " Validate timestamp range (between 1970 and 2099)
+              IF lv_timestamp BETWEEN 0 AND 4102444800.
+                lv_pstng_date = '19700101'.
+                lv_pstng_date = lv_pstng_date + ( lv_timestamp / 86400 ).
+              ELSE.
+                RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                  EXPORTING
+                    textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                    message = |Invalid timestamp range in PstngDate: { ls_first_item_in_group-pstngdate }|.
+              ENDIF.
+            ELSE.
+              RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                EXPORTING
+                  textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                  message = |Non-numeric timestamp in PstngDate: { ls_first_item_in_group-pstngdate }|.
+            ENDIF.
+          ELSE.
+            " Handle regular date format (YYYYMMDD)
+            REPLACE ALL OCCURRENCES OF REGEX `[^0-9]` IN lv_str WITH ``.
+            IF strlen( lv_str ) >= 8.
+              lv_pstng_date = lv_str(8).
+              " Validate date
+              CALL FUNCTION 'DATE_CHECK_PLAUSIBILITY'
+                EXPORTING
+                  date = lv_pstng_date
+                EXCEPTIONS
+                  plausibility_check_failed = 1.
+              IF sy-subrc <> 0.
+                RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                  EXPORTING
+                    textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                    message = |Invalid PstngDate format: { ls_first_item_in_group-pstngdate }|.
+              ENDIF.
+            ELSE.
+              RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                EXPORTING
+                  textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                  message = |Invalid PstngDate format: { ls_first_item_in_group-pstngdate }|.
+            ENDIF.
+          ENDIF.
 
-         CATCH cx_sy_conversion_no_number.
-           RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-             EXPORTING
-               textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-               message = |Invalid date conversion error|
-               http_status_code = '400'.
-       ENDTRY.
+        CATCH cx_sy_conversion_no_number.
+          RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+            EXPORTING
+              textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+              message = |Invalid date conversion error|.
+      ENDTRY.
 
       ls_bapiheader-doc_date = lv_doc_date.
       ls_bapiheader-pstng_date = lv_pstng_date.
@@ -411,8 +382,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |Failed to read first item for group: { ls_slip-slip }|
-          http_status_code = '400'.
+          message = |Failed to read first item for group: { ls_slip-slip }|.
     ENDIF.
 
     " Prepare BAPI items with proper line item numbering
@@ -468,8 +438,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |No items prepared for BAPI for GrGiSlipNo: { ls_slip-slip }|
-          http_status_code = '400'.
+          message = |No items prepared for BAPI for GrGiSlipNo: { ls_slip-slip }|.
     ENDIF.
 
     " Call BAPI
@@ -489,8 +458,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
         EXPORTING
           textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = lv_return-message
-          http_status_code = '400'.
+          message = lv_return-message.
     ENDLOOP.
 
     " BAPI succeeded - commit
