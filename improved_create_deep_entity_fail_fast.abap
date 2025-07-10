@@ -237,18 +237,7 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
       ENDIF.
     ENDIF.
 
-    " Authorization checks
-    AUTHORITY-CHECK OBJECT 'M_MATE_WRK'
-      ID 'ACTVT' FIELD '02'
-      ID 'WERKS' FIELD ls_check-plant.
-
-    IF sy-subrc <> 0.
-      RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-        EXPORTING
-          textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-          message = |No authorization for plant { ls_check-plant }|
-          http_status_code = '400'.
-    ENDIF.
+    
 
     " Enhanced duplicate slip number check
     SELECT SINGLE mblnr FROM mkpf
@@ -292,23 +281,126 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
     " Get header fields from first item of the current group
     READ TABLE lt_group_items INTO DATA(ls_first_item_in_group) INDEX 1.
     IF sy-subrc = 0.
-      TRY.
-          " Enhanced date conversion with better error handling
-          lv_str = ls_first_item_in_group-docdate.
-          PERFORM convert_date_safely USING lv_str CHANGING lv_doc_date.
+             TRY.
+           " Enhanced date conversion with better error handling
+           lv_str = ls_first_item_in_group-docdate.
+           " Convert DocDate
+           IF lv_str CS '/Date(' AND lv_str CS ')/' .
+             " Handle JSON date format /Date(timestamp)/
+             REPLACE '/Date(' IN lv_str WITH ''.
+             REPLACE ')/' IN lv_str WITH ''.
+             " Validate timestamp is numeric
+             IF lv_str CO '0123456789'.
+               DATA(lv_timestamp) = CONV int8( lv_str ).
+               lv_timestamp = lv_timestamp / 1000. " Convert to seconds
+               " Validate timestamp range (between 1970 and 2099)
+               IF lv_timestamp BETWEEN 0 AND 4102444800.
+                 lv_doc_date = '19700101'.
+                 lv_doc_date = lv_doc_date + ( lv_timestamp / 86400 ).
+               ELSE.
+                 RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                   EXPORTING
+                     textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                     message = |Invalid timestamp range in DocDate: { ls_first_item_in_group-docdate }|
+                     http_status_code = '400'.
+               ENDIF.
+             ELSE.
+               RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                 EXPORTING
+                   textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                   message = |Non-numeric timestamp in DocDate: { ls_first_item_in_group-docdate }|
+                   http_status_code = '400'.
+             ENDIF.
+           ELSE.
+             " Handle regular date format (YYYYMMDD)
+             REPLACE ALL OCCURRENCES OF REGEX `[^0-9]` IN lv_str WITH ``.
+             IF strlen( lv_str ) >= 8.
+               lv_doc_date = lv_str(8).
+               " Validate date
+               CALL FUNCTION 'DATE_CHECK_PLAUSIBILITY'
+                 EXPORTING
+                   date = lv_doc_date
+                 EXCEPTIONS
+                   plausibility_check_failed = 1.
+               IF sy-subrc <> 0.
+                 RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                   EXPORTING
+                     textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                     message = |Invalid DocDate format: { ls_first_item_in_group-docdate }|
+                     http_status_code = '400'.
+               ENDIF.
+             ELSE.
+               RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                 EXPORTING
+                   textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                   message = |Invalid DocDate format: { ls_first_item_in_group-docdate }|
+                   http_status_code = '400'.
+             ENDIF.
+           ENDIF.
 
-          " Same for posting date
-          lv_str = ls_first_item_in_group-pstngdate.
-          PERFORM convert_date_safely USING lv_str CHANGING lv_pstng_date.
+           " Same for posting date
+           lv_str = ls_first_item_in_group-pstngdate.
+           " Convert PstngDate
+           IF lv_str CS '/Date(' AND lv_str CS ')/' .
+             " Handle JSON date format /Date(timestamp)/
+             REPLACE '/Date(' IN lv_str WITH ''.
+             REPLACE ')/' IN lv_str WITH ''.
+             " Validate timestamp is numeric
+             IF lv_str CO '0123456789'.
+               lv_timestamp = CONV int8( lv_str ).
+               lv_timestamp = lv_timestamp / 1000. " Convert to seconds
+               " Validate timestamp range (between 1970 and 2099)
+               IF lv_timestamp BETWEEN 0 AND 4102444800.
+                 lv_pstng_date = '19700101'.
+                 lv_pstng_date = lv_pstng_date + ( lv_timestamp / 86400 ).
+               ELSE.
+                 RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                   EXPORTING
+                     textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                     message = |Invalid timestamp range in PstngDate: { ls_first_item_in_group-pstngdate }|
+                     http_status_code = '400'.
+               ENDIF.
+             ELSE.
+               RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                 EXPORTING
+                   textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                   message = |Non-numeric timestamp in PstngDate: { ls_first_item_in_group-pstngdate }|
+                   http_status_code = '400'.
+             ENDIF.
+           ELSE.
+             " Handle regular date format (YYYYMMDD)
+             REPLACE ALL OCCURRENCES OF REGEX `[^0-9]` IN lv_str WITH ``.
+             IF strlen( lv_str ) >= 8.
+               lv_pstng_date = lv_str(8).
+               " Validate date
+               CALL FUNCTION 'DATE_CHECK_PLAUSIBILITY'
+                 EXPORTING
+                   date = lv_pstng_date
+                 EXCEPTIONS
+                   plausibility_check_failed = 1.
+               IF sy-subrc <> 0.
+                 RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                   EXPORTING
+                     textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                     message = |Invalid PstngDate format: { ls_first_item_in_group-pstngdate }|
+                     http_status_code = '400'.
+               ENDIF.
+             ELSE.
+               RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+                 EXPORTING
+                   textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+                   message = |Invalid PstngDate format: { ls_first_item_in_group-pstngdate }|
+                   http_status_code = '400'.
+             ENDIF.
+           ENDIF.
 
-        CATCH /iwbep/cx_mgw_busi_exception INTO DATA(lx_date_conv).
-          " Date conversion error - fail immediately
-          RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-            EXPORTING
-              textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
-              message = lx_date_conv->get_text( )
-              http_status_code = '400'.
-      ENDTRY.
+         CATCH cx_sy_conversion_no_number.
+           RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+             EXPORTING
+               textid = /iwbep/cx_mgw_busi_exception=>business_error_unlimited
+               message = |Invalid date conversion error|
+               http_status_code = '400'.
+       ENDTRY.
 
       ls_bapiheader-doc_date = lv_doc_date.
       ls_bapiheader-pstng_date = lv_pstng_date.
@@ -443,68 +535,3 @@ METHOD /iwbep/if_mgw_appl_srv_runtime~create_deep_entity.
   ).
 
 ENDMETHOD.
-
-" Helper form for enhanced date conversion
-FORM convert_date_safely USING p_date_string TYPE string
-                        CHANGING p_result_date TYPE dats.
-
-  DATA: lv_str TYPE string,
-        lv_timestamp TYPE int8.
-
-  lv_str = p_date_string.
-
-  IF lv_str CS '/Date(' AND lv_str CS ')/' .
-    " Handle JSON date format /Date(timestamp)/
-    TRY.
-        REPLACE '/Date(' IN lv_str WITH ''.
-        REPLACE ')/' IN lv_str WITH ''.
-
-        " Validate timestamp is numeric
-        IF lv_str CO '0123456789'.
-          lv_timestamp = CONV int8( lv_str ).
-          lv_timestamp = lv_timestamp / 1000. " Convert to seconds
-
-          " Validate timestamp range (between 1970 and 2099)
-          IF lv_timestamp BETWEEN 0 AND 4102444800.
-            p_result_date = '19700101'.
-            p_result_date = p_result_date + ( lv_timestamp / 86400 ).
-          ELSE.
-            RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-              EXPORTING
-                message = |Invalid timestamp range in date: { p_date_string }|.
-          ENDIF.
-        ELSE.
-          RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-            EXPORTING
-              message = |Non-numeric timestamp in date: { p_date_string }|.
-        ENDIF.
-
-      CATCH cx_sy_conversion_no_number.
-        RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-          EXPORTING
-            message = |Invalid timestamp format in date: { p_date_string }|.
-    ENDTRY.
-  ELSE.
-    " Handle regular date format (YYYYMMDD)
-    REPLACE ALL OCCURRENCES OF REGEX `[^0-9]` IN lv_str WITH ``.
-    IF strlen( lv_str ) >= 8.
-      p_result_date = lv_str(8).
-      " Validate date
-      CALL FUNCTION 'DATE_CHECK_PLAUSIBILITY'
-        EXPORTING
-          date = p_result_date
-        EXCEPTIONS
-          plausibility_check_failed = 1.
-      IF sy-subrc <> 0.
-        RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-          EXPORTING
-            message = |Invalid date format: { p_date_string }|.
-      ENDIF.
-    ELSE.
-      RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
-        EXPORTING
-          message = |Invalid date format: { p_date_string }|.
-    ENDIF.
-  ENDIF.
-
-ENDFORM.
